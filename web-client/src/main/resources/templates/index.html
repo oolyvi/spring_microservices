@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATM API Console</title>
+    <style>
+        :root {
+            --bg: #fff;
+            --p: #f6f7f9;
+            --p2: #eceef2;
+            --bd: #d8dce3;
+            --tx: #1d2330;
+            --mu: #697386;
+            --ac: #ff6c37;
+            --ok: #1a9d5a;
+            --er: #d6322e;
+            --wn: #c98a00;
+            --GET: #1a9d5a;
+            --POST: #d97706;
+            --PUT: #2563eb;
+            --PATCH: #7c3aed;
+            --DELETE: #d6322e;
+            --code: #f3f4f7
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #1b1d22;
+                --p: #22252b;
+                --p2: #2b2f37;
+                --bd: #363b45;
+                --tx: #e6e8ec;
+                --mu: #98a1b0;
+                --code: #14161a;
+                --GET: #3ccf82;
+                --POST: #f5a042;
+                --PUT: #5b9bff;
+                --PATCH: #a78bfa;
+                --DELETE: #ff6b66;
+                --ok: #3ccf82;
+                --er: #ff6b66
+            }
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0
+        }
+
+        body {
+            font: 13px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--tx);
+            display: flex;
+            flex-direction: column
+        }
+
+        button, input, select, textarea {
+            font: inherit;
+            color: inherit
+        }
+
+        button {
+            background: var(--p2);
+            border: 1px solid var(--bd);
+            border-radius: 6px;
+            padding: 5px 10px;
+            cursor: pointer
+        }
+
+        button:hover {
+            border-color: var(--mu)
+        }
+
+        input, select, textarea {
+            background: var(--bg);
+            border: 1px solid var(--bd);
+            border-radius: 6px;
+            padding: 5px 8px;
+            min-width: 0
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: 2px solid var(--ac);
+            outline-offset: -1px
+        }
+
+        header {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 8px 12px;
+            background: var(--p);
+            border-bottom: 1px solid var(--bd);
+            flex-wrap: wrap
+        }
+
+        header h1 {
+            font-size: 15px;
+            margin: 0 8px 0 0
+        }
+
+        header h1 i {
+            color: var(--ac);
+            font-style: normal
+        }
+
+        header a {
+            color: var(--mu);
+            text-decoration: none;
+            margin-left: auto
+        }
+
+        header a:hover {
+            color: var(--tx)
+        }
+
+        #host {
+            width: 120px
+        }
+
+        #app {
+            flex: 1;
+            display: flex;
+            min-height: 0
+        }
+
+        aside {
+            width: 310px;
+            border-right: 1px solid var(--bd);
+            background: var(--p);
+            display: flex;
+            flex-direction: column;
+            min-height: 0
+        }
+
+        aside .top {
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px
+        }
+
+        .seg {
+            display: flex
+        }
+
+        .seg button {
+            flex: 1;
+            border-radius: 0
+        }
+
+        .seg button:first-child {
+            border-radius: 6px 0 0 6px
+        }
+
+        .seg button:last-child {
+            border-radius: 0 6px 6px 0
+        }
+
+        .seg .on {
+            background: var(--ac);
+            border-color: var(--ac);
+            color: #fff
+        }
+
+        #tree {
+            overflow: auto;
+            flex: 1;
+            padding-bottom: 20px
+        }
+
+        details > summary {
+            cursor: pointer;
+            padding: 7px 10px;
+            font-weight: 600;
+            list-style: none;
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: var(--p)
+        }
+
+        details > summary::before {
+            content: "\25B8";
+            color: var(--mu)
+        }
+
+        details[open] > summary::before {
+            content: "\25BE"
+        }
+
+        summary .pt {
+            margin-left: auto;
+            font-weight: 400;
+            font-size: 11px;
+            color: var(--mu);
+            background: var(--p2);
+            padding: 1px 7px;
+            border-radius: 9px
+        }
+
+        .it {
+            display: flex;
+            gap: 7px;
+            align-items: baseline;
+            padding: 4px 10px 4px 22px;
+            cursor: pointer;
+            border-left: 3px solid transparent
+        }
+
+        .it:hover {
+            background: var(--p2)
+        }
+
+        .it.on {
+            background: var(--p2);
+            border-left-color: var(--ac)
+        }
+
+        .it small {
+            color: var(--mu);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap
+        }
+
+        .m {
+            font-weight: 700;
+            font-size: 10.5px;
+            min-width: 44px;
+            display: inline-block
+        }
+
+        .GET {
+            color: var(--GET)
+        }
+
+        .POST {
+            color: var(--POST)
+        }
+
+        .PUT {
+            color: var(--PUT)
+        }
+
+        .PATCH {
+            color: var(--PATCH)
+        }
+
+        .DELETE {
+            color: var(--DELETE)
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0
+        }
+
+        #tabs {
+            display: flex;
+            background: var(--p);
+            border-bottom: 1px solid var(--bd);
+            overflow-x: auto
+        }
+
+        .tb {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            padding: 7px 10px;
+            border-right: 1px solid var(--bd);
+            cursor: pointer;
+            white-space: nowrap;
+            border-bottom: 2px solid transparent
+        }
+
+        .tb.on {
+            background: var(--bg);
+            border-bottom-color: var(--ac)
+        }
+
+        .tb b {
+            opacity: .5;
+            font-weight: 400;
+            padding: 0 3px
+        }
+
+        .tb b:hover {
+            opacity: 1;
+            color: var(--er)
+        }
+
+        #pane {
+            flex: 1;
+            overflow: auto;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px
+        }
+
+        .bar {
+            display: flex;
+            gap: 8px
+        }
+
+        .bar .m {
+            align-self: center;
+            font-size: 13px;
+            min-width: 56px
+        }
+
+        #url {
+            flex: 1;
+            font-family: ui-monospace, Menlo, Consolas, monospace
+        }
+
+        .send {
+            background: var(--ac);
+            border-color: var(--ac);
+            color: #fff;
+            font-weight: 600;
+            padding: 5px 22px
+        }
+
+        .send:disabled {
+            opacity: .6
+        }
+
+        .desc {
+            margin: 0;
+            color: var(--mu)
+        }
+
+        .st {
+            display: flex;
+            gap: 2px;
+            border-bottom: 1px solid var(--bd);
+            margin-top: 4px
+        }
+
+        .st button {
+            border: 0;
+            border-bottom: 2px solid transparent;
+            border-radius: 0;
+            background: none
+        }
+
+        .st button.on {
+            border-bottom-color: var(--ac);
+            font-weight: 600
+        }
+
+        .st sup {
+            color: var(--ok);
+            margin-left: 2px
+        }
+
+        table.kv {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 6px
+        }
+
+        table.kv th {
+            text-align: left;
+            color: var(--mu);
+            font-weight: 500;
+            padding: 3px 4px
+        }
+
+        table.kv td {
+            padding: 2px
+        }
+
+        table.kv td input:not([type=checkbox]) {
+            width: 100%
+        }
+
+        table.kv td:first-child, table.kv td:last-child {
+            width: 30px;
+            text-align: center
+        }
+
+        .x {
+            border: 0;
+            background: none;
+            color: var(--mu)
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            font: 12.5px/1.5 ui-monospace, Menlo, Consolas, monospace;
+            resize: vertical
+        }
+
+        pre, .out {
+            background: var(--code);
+            border: 1px solid var(--bd);
+            border-radius: 6px;
+            padding: 10px;
+            margin: 0;
+            overflow: auto;
+            font: 12.5px/1.5 ui-monospace, Menlo, Consolas, monospace;
+            white-space: pre-wrap;
+            word-break: break-all
+        }
+
+        .res {
+            border-top: 2px solid var(--bd);
+            padding-top: 10px
+        }
+
+        .rh {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 8px
+        }
+
+        .pill {
+            padding: 2px 9px;
+            border-radius: 10px;
+            font-weight: 700;
+            color: #fff
+        }
+
+        .s2 {
+            background: var(--ok)
+        }
+
+        .s3 {
+            background: var(--wn)
+        }
+
+        .s4, .s5, .se {
+            background: var(--er)
+        }
+
+        .mu {
+            color: var(--mu)
+        }
+
+        .hint {
+            background: var(--p);
+            border: 1px solid var(--bd);
+            border-left: 3px solid var(--wn);
+            padding: 8px 10px;
+            border-radius: 6px;
+            margin-top: 8px
+        }
+
+        i.k {
+            color: #9a5bd6;
+            font-style: normal
+        }
+
+        i.s {
+            color: var(--ok);
+            font-style: normal
+        }
+
+        i.n {
+            color: var(--PUT);
+            font-style: normal
+        }
+
+        i.b {
+            color: var(--POST);
+            font-style: normal
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns:repeat(auto-fill, minmax(210px, 1fr));
+            gap: 10px
+        }
+
+        .card {
+            background: var(--p);
+            border: 1px solid var(--bd);
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer
+        }
+
+        .card:hover {
+            border-color: var(--ac)
+        }
+
+        .card h3 {
+            margin: 0 0 4px;
+            font-size: 14px
+        }
+
+        dialog {
+            background: var(--bg);
+            color: var(--tx);
+            border: 1px solid var(--bd);
+            border-radius: 10px;
+            padding: 16px;
+            width: min(440px, 92vw)
+        }
+
+        dialog::backdrop {
+            background: rgba(0, 0, 0, .45)
+        }
+
+        dialog label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin: 6px 0
+        }
+
+        dialog input {
+            width: 120px
+        }
+
+        code {
+            background: var(--code);
+            padding: 1px 5px;
+            border-radius: 4px
+        }
+
+        @media (max-width: 760px) {
+            #app {
+                flex-direction: column
+            }
+
+            aside {
+                width: 100%;
+                max-height: 38vh;
+                border-right: 0;
+                border-bottom: 1px solid var(--bd)
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1><i>&#9889;</i> ATM API Console</h1>
+    <select id="mode" title="How requests are routed">
+        <option value="direct">Direct to each service port</option>
+        <option value="gateway">Via API Gateway</option>
+    </select>
+    <label class="mu">host <input id="host" value="localhost"></label>
+    <button data-a="servers">Servers &amp; ports</button>
+    <a id="eureka" target="_blank" rel="noopener">Eureka dashboard &#8599;</a>
+</header>
+<div id="app">
+    <aside>
+        <div class="top">
+            <input id="filter" placeholder="Filter endpoints (name, path, method)">
+            <div class="seg">
+                <button data-a="view" data-v="col" class="on">Collections</button>
+                <button data-a="view" data-v="his">History</button>
+            </div>
+        </div>
+        <div id="tree"></div>
+    </aside>
+    <main>
+        <div id="tabs"></div>
+        <div id="pane"></div>
+    </main>
+</div>
+<dialog id="dlg"></dialog>
+
+<script th:inline="none">
+    const J = o => JSON.stringify(o, null, 2);
+    const E = (m, p, n, o) => Object.assign({m, p, n}, o);
+    const SVC = [
+        {
+            id: 'account', n: 'Account Service', port: 8081, ep: [
+                E('GET', '/account/all', 'Get all accounts'),
+                E('GET', '/account/{id}', 'Get account by id'),
+                E('POST', '/account/add', 'Add account', {
+                    d: 'accountType: CHECKING | SAVINGS. status: ACTIVE | BLOCKED | CLOSED. Returns 201.',
+                    b: {
+                        accountNumber: 'AZ100000000000000005',
+                        balance: 300,
+                        dailyLimit: 1000,
+                        accountType: 'CHECKING',
+                        status: 'ACTIVE',
+                        customerId: 1
+                    }
+                }),
+                E('PUT', '/account/{id}', 'Replace account', {
+                    b: {
+                        accountNumber: 'AZ100000000000000001',
+                        balance: 500,
+                        dailyLimit: 1000,
+                        accountType: 'CHECKING',
+                        status: 'ACTIVE',
+                        customerId: 1
+                    }
+                }),
+                E('DELETE', '/account/{id}', 'Delete account', {d: 'Returns 204 No Content.'}),
+                E('POST', '/account/{accountId}/unblock', 'Unblock account (admin)', {pv: {accountId: '1'}}),
+                E('POST', '/account/{accountId}/block', 'Block account (admin)'),
+                E('GET', '/account/{id}/balance', 'Get balance'),
+                E('POST', '/account/{id}/debit', 'Debit account', {
+                    idem: 1,
+                    d: 'Used internally by transaction-service. Replaying the same Idempotency-Key never moves money twice.',
+                    b: {amount: 50.00}
+                }),
+                E('POST', '/account/{id}/credit', 'Credit account', {idem: 1, b: {amount: 50.00}}),
+                E('PUT', '/account/{id}/limit', 'Update daily limit', {q: 'limit=999'})
+            ]
+        },
+        {
+            id: 'admin', n: 'Admin Service', port: 8082, ep: [
+                E('POST', '/admin/login', 'Admin login', {
+                    d: 'Demo login: admin / 1234. Returns 401 on bad credentials.',
+                    b: {username: 'admin', password: '1234'}
+                }),
+                E('PUT', '/admin/{adminId}/profile', 'Update admin profile', {q: 'username=admin&email=admin@atm.com'}),
+                E('PATCH', '/admin/accounts/{accountId}/limit', 'Update account daily limit', {
+                    q: 'limit=999',
+                    d: 'Calls account-service via Feign.'
+                }),
+                E('PATCH', '/admin/terminals/{terminalId}/status', 'Change terminal status', {
+                    q: 'status=OFFLINE',
+                    d: 'status: ACTIVE | MAINTENANCE | OFFLINE. Calls atm-service via Feign.'
+                }),
+                E('POST', '/admin/cards/{cardId}/unblock', 'Unblock card', {d: 'Calls card-service via Feign.'}),
+                E('POST', '/admin/cards/{cardId}/block', 'Block card', {d: 'Calls card-service via Feign; publishes a card event to Kafka.'}),
+                E('POST', '/admin/cards/{cardId}/reset-pin', 'Force reset card PIN', {
+                    q: 'temporaryPinHash=myHashedPin123',
+                    d: 'temporaryPinHash must be the BCrypt hash of the temporary PIN.'
+                })
+            ]
+        },
+        {
+            id: 'atm', n: 'ATM Service', port: 8083, ep: [
+                E('POST', '/atm/login', 'ATM login (card + PIN)', {
+                    d: 'Demo card 4532678912348812, PIN 1234.',
+                    b: {cardNumber: '4532678912348812', pin: '1234'}
+                }),
+                E('GET', '/atm/balance', 'Balance by card number', {q: 'cardNumber=4532678912348812'}),
+                E('POST', '/atm/terminal/add', 'Add terminal', {
+                    b: {
+                        terminalCode: 'ATM-KICK-01',
+                        location: 'Khaldoun 25',
+                        status: 'ACTIVE',
+                        ipAddress: '127.0.0.1',
+                        softwareVersion: 'v2.1.1',
+                        cassette1Count: 0,
+                        cassette5Count: 0,
+                        cassette10Count: 0,
+                        cassette20Count: 0,
+                        cassette50Count: 2,
+                        cassette100Count: 0,
+                        cassette200Count: 0,
+                        cassette500Count: 0
+                    }
+                }),
+                E('GET', '/atm/terminal/all', 'Get all terminals'),
+                E('GET', '/atm/terminal/{id}', 'Get terminal by id'),
+                E('PUT', '/atm/terminal/{id}/status', 'Change terminal status', {
+                    q: 'status=OFFLINE',
+                    d: 'status: ACTIVE | MAINTENANCE | OFFLINE'
+                }),
+                E('PUT', '/atm/terminal/{id}/dispense', 'Dispense bills', {
+                    d: 'Body is a map of denomination -> count.',
+                    b: {'500': 1, '100': 1}
+                })
+            ]
+        },
+        {
+            id: 'card', n: 'Card Service', port: 8084, ep: [
+                E('GET', '/card/all', 'Get all cards'),
+                E('GET', '/card/{id}', 'Get card by id'),
+                E('POST', '/card/add', 'Add card', {
+                    d: 'cardType: DEBIT | CREDIT',
+                    b: {cardNumber: '4532678912341221', pin: '6789', cardType: 'DEBIT', customerId: 1, accountId: 1}
+                }),
+                E('POST', '/card/{id}/verify-pin', 'Verify PIN', {b: {pin: '1234'}}),
+                E('POST', '/card/{cardId}/pin-change', 'Change PIN', {b: {oldPin: '1234', newPin: '4321'}}),
+                E('POST', '/card/{cardId}/block', 'Block card'),
+                E('POST', '/card/{cardId}/unblock', 'Unblock card'),
+                E('POST', '/card/{cardId}/reset-pin', 'Force reset PIN', {
+                    q: 'temporaryPinHash=myHashedPin123',
+                    d: 'temporaryPinHash must be a BCrypt hash.'
+                }),
+                E('POST', '/card/authenticate', 'Authenticate card (internal / Feign)', {
+                    q: 'cardNumber=4532678912348812&pin=1234',
+                    d: 'Used by atm-service. The PIN is a query parameter (see README security notes).'
+                }),
+                E('GET', '/card/balance', 'Balance by card number (internal / Feign)', {q: 'cardNumber=4532678912348812'})
+            ]
+        },
+        {
+            id: 'cash', n: 'Cash Service', port: 8085, ep: [
+                E('POST', '/cash/withdraw', 'Withdraw cash', {
+                    q: 'atmId=1&amount=600',
+                    d: 'Returns the bill breakdown {denomination: count}. Draining a cassette to its threshold publishes atm.cash.low.'
+                })
+            ]
+        },
+        {
+            id: 'customer', n: 'Customer Service', port: 8086, ep: [
+                E('GET', '/customer/all', 'Get all customers'),
+                E('GET', '/customer/{id}', 'Get customer by id'),
+                E('POST', '/customer/add', 'Add customer', {
+                    d: 'status: ACTIVE | BLOCKED | CLOSED. Returns 201.',
+                    b: {
+                        firstName: 'Name',
+                        lastName: 'Lastname',
+                        email: 'a@example.com',
+                        phoneNumber: '051123123',
+                        dateOfBirth: '2000-12-10',
+                        nationalId: 'DEMO-NAT-100',
+                        status: 'ACTIVE',
+                        passwordHash: 'best_password_in_the_world'
+                    }
+                }),
+                E('PUT', '/customer/{id}', 'Replace customer', {
+                    b: {
+                        firstName: 'Name',
+                        lastName: 'Lastname',
+                        email: 'a@example.com',
+                        phoneNumber: '051123123',
+                        dateOfBirth: '2000-12-10',
+                        nationalId: 'DEMO-NAT-100',
+                        status: 'ACTIVE'
+                    }
+                }),
+                E('DELETE', '/customer/{id}', 'Deactivate customer', {d: 'Returns 204 No Content.'}),
+                E('GET', '/customer/status/{status}', 'Get customers by status', {
+                    pv: {status: 'ACTIVE'},
+                    d: 'status: ACTIVE | BLOCKED | CLOSED'
+                })
+            ]
+        },
+        {
+            id: 'notification', n: 'Notification Service', port: 8087, ep: [
+                E('POST', '/notification/send', 'Send notification', {
+                    d: 'type: EMAIL | SMS | WEBSOCKET. 400 for bad input, 502 if the sender fails. (WebSocket/STOMP endpoint /ws-notifications is not testable from here.)',
+                    b: {type: 'EMAIL', recipient: 'user@example.com', title: 'Title', message: 'Perfect message!'}
+                })
+            ]
+        },
+        {
+            id: 'transaction', n: 'Transaction Service', port: 8088, ep: [
+                E('POST', '/transaction/execute', 'Execute transaction', {
+                    idem: 1,
+                    d: 'type: DEBIT | CREDIT. amount >= 0.01. Publishes atm.transactions.completed.',
+                    b: {accountId: 1, amount: 50.00, type: 'DEBIT'}
+                }),
+                E('GET', '/transaction', 'Transaction history (paged)', {
+                    q: 'accountId=1&page=0&size=10',
+                    o: 'startDate=2026-01-01T00:00:00&endDate=2026-12-31T23:59:59&sort=id,desc',
+                    d: 'All params optional. Dates are ISO date-time. Returns a Spring Page.'
+                }),
+                E('GET', '/transaction/{id}', 'Get transaction by id'),
+                E('POST', '/transaction/{id}/refund', 'Refund transaction', {
+                    idem: 1,
+                    d: 'Use a NEW Idempotency-Key, not the original transaction\'s.'
+                }),
+                E('GET', '/transaction/{id}/receipt', 'Get receipt'),
+                E('POST', '/transaction/transfer', 'Transfer funds', {
+                    idem: 1,
+                    b: {sourceAccountId: 1, destinationAccountId: 2, amount: 50.00}
+                })
+            ]
+        }
+    ];
+
+    const $ = s => document.querySelector(s);
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;'
+    }[c]));
+    const LS = {
+        get(k, d) {
+            try {
+                const v = JSON.parse(localStorage.getItem(k));
+                return v == null ? d : v;
+            } catch (e) {
+                return d;
+            }
+        },
+        set(k, v) {
+            try {
+                localStorage.setItem(k, JSON.stringify(v));
+            } catch (e) {
+            }
+        }
+    };
+    const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = Math.random() * 16 | 0;
+        return (c === 'x' ? r : (r & 3 | 8)).toString(16);
+    }));
+    const sub = s => String(s).replace(/\{\{\$(\w+)\}\}/g, (m, k) => k === 'guid' ? uuid() : k === 'timestamp' ? Date.now() : k === 'randomInt' ? Math.floor(Math.random() * 1000) : m);
+    const proto = location.protocol.indexOf('http') === 0 ? location.protocol : 'http:';
+
+    let cfg = LS.get('atm.cfg', null) || {
+        mode: location.port === '8765' ? 'gateway' : 'direct',
+        host: location.hostname || 'localhost',
+        gw: 8765,
+        ports: {}
+    };
+    let tabs = [], cur = null, view = 'col', his = LS.get('atm.his', []);
+    const T = () => tabs.find(t => t.key === cur);
+    const base = s => proto + '//' + cfg.host + ':' + (cfg.mode === 'gateway' ? cfg.gw : (cfg.ports[s.id] || s.port));
+    const saveCfg = () => LS.set('atm.cfg', cfg);
+
+    function mk(si, ei, key) {
+        const s = SVC[si], e = s.ep[ei], pv = {};
+        (e.p.match(/\{(\w+)\}/g) || []).forEach(m => {
+            const k = m.slice(1, -1);
+            pv[k] = (e.pv && e.pv[k]) || '1';
+        });
+        const kv = (str, on) => str ? str.split('&').map(x => {
+            const i = x.indexOf('=');
+            return {on, k: x.slice(0, i), v: x.slice(i + 1)};
+        }) : [];
+        const h = [];
+        if (e.idem) h.push({on: true, k: 'Idempotency-Key', v: '{{$guid}}'});
+        if (e.b) h.push({on: true, k: 'Content-Type', v: 'application/json'});
+        const q = kv(e.q, true).concat(kv(e.o, false));
+        const t = {key, si, ei, s, e, pv, q, h, body: e.b ? J(e.b) : '', resp: null, rtab: 'pretty'};
+        t.sub = q.length ? 'q' : Object.keys(pv).length ? 'p' : e.b ? 'b' : 'h';
+        return t;
+    }
+
+    function build(t, resolve) {
+        const f = resolve ? sub : (x => x);
+        const path = t.e.p.replace(/\{(\w+)\}/g, (m, k) => t.pv[k] ? encodeURIComponent(f(t.pv[k])) : m);
+        const qs = t.q.filter(r => r.on && r.k).map(r => encodeURIComponent(r.k) + '=' + encodeURIComponent(f(r.v))).join('&');
+        return base(t.s) + path + (qs ? '?' + qs : '');
+    }
+
+    const hasBody = t => t.body.trim() && ['GET', 'HEAD'].indexOf(t.e.m) < 0;
+
+    function curl(t) {
+        let c = 'curl -X ' + t.e.m + " '" + build(t, false) + "'";
+        t.h.filter(r => r.on && r.k).forEach(r => c += " \\\n  -H '" + r.k + ': ' + r.v + "'");
+        if (hasBody(t)) c += " \\\n  -d '" + t.body.replace(/'/g, "'\\''") + "'";
+        return c;
+    }
+
+    function paintTree() {
+        const f = $('#filter').value.trim().toLowerCase();
+        if (view === 'his') {
+            $('#tree').innerHTML = his.length ? his.map((h, i) => '<div class="it" data-a="hist" data-i="' + i + '"><span class="m ' + h.m + '">' + h.m + '</span><small title="' + esc(h.u) + '">' + esc(h.u.replace(/^https?:\/\//, '')) + '</small><span class="mu" style="margin-left:auto">' + (h.st || 'ERR') + '</span></div>').join('') +
+                '<div style="padding:10px"><button data-a="clearhis">Clear history</button></div>' : '<p class="mu" style="padding:12px">No requests yet.</p>';
+            return;
+        }
+        $('#tree').innerHTML = SVC.map((s, si) => {
+            const items = s.ep.map((e, ei) => ({
+                e,
+                ei
+            })).filter(x => !f || (x.e.n + x.e.p + x.e.m + s.n).toLowerCase().indexOf(f) >= 0);
+            if (!items.length) return '';
+            return '<details open><summary>' + esc(s.n) + '<span class="pt" title="' + esc(base(s)) + '">:' + (cfg.mode === 'gateway' ? cfg.gw : (cfg.ports[s.id] || s.port)) + '</span></summary>' +
+                items.map(x => '<div class="it' + (cur === si + '.' + x.ei ? ' on' : '') + '" data-a="open" data-si="' + si + '" data-ei="' + x.ei + '"><span class="m ' + x.e.m + '">' + x.e.m + '</span><span>' + esc(x.e.n) + '</span></div>').join('') + '</details>';
+        }).join('');
+    }
+
+    function paintTabs() {
+        $('#tabs').innerHTML = tabs.map(t => '<div class="tb' + (t.key === cur ? ' on' : '') + '" data-a="tab" data-k="' + t.key + '"><span class="m ' + t.e.m + '">' + t.e.m + '</span>' + esc(t.e.n) + '<b data-a="close" data-k="' + t.key + '">&times;</b></div>').join('');
+    }
+
+    function kvTable(t, l) {
+        return '<table class="kv"><tr><th></th><th>Key</th><th>Value</th><th></th></tr>' + t[l].map((r, i) => {
+            const a = ' data-l="' + l + '" data-i="' + i + '"';
+            return '<tr><td><input type="checkbox"' + a + ' data-f="on"' + (r.on ? ' checked' : '') + '></td><td><input' + a + ' data-f="k" value="' + esc(r.k) + '"></td><td><input' + a + ' data-f="v" value="' + esc(r.v) + '"></td><td><button class="x" data-a="del"' + a + '>&times;</button></td></tr>';
+        }).join('') + '</table><button data-a="add" data-l="' + l + '">+ Add</button>';
+    }
+
+    function paintSub(t) {
+        const n = l => t[l].filter(r => r.on && r.k).length, pk = Object.keys(t.pv).length;
+        const tabsDef = [['q', 'Query Params', n('q')], ['p', 'Path Variables', pk], ['h', 'Headers', n('h')], ['b', 'Body', hasBody(t) ? 1 : 0], ['c', 'cURL', 0]];
+        $('#st').innerHTML = tabsDef.map(x => '<button data-a="sub" data-s="' + x[0] + '" class="' + (t.sub === x[0] ? 'on' : '') + '">' + x[1] + (x[2] ? '<sup>' + x[2] + '</sup>' : '') + '</button>').join('');
+        let h = '';
+        if (t.sub === 'q') h = kvTable(t, 'q');
+        else if (t.sub === 'h') h = kvTable(t, 'h') + '<p class="mu"><code>{{$guid}}</code>, <code>{{$timestamp}}</code> and <code>{{$randomInt}}</code> are replaced on every send.</p>';
+        else if (t.sub === 'p') h = pk ? '<table class="kv"><tr><th>Variable</th><th>Value</th></tr>' + Object.keys(t.pv).map(k => '<tr><td style="width:160px;text-align:left"><code>{' + esc(k) + '}</code></td><td><input data-pv="' + esc(k) + '" value="' + esc(t.pv[k]) + '"></td></tr>').join('') + '</table>' : '<p class="mu">This endpoint has no path variables.</p>';
+        else if (t.sub === 'b') h = ['GET', 'HEAD'].indexOf(t.e.m) >= 0 ? '<p class="mu">' + t.e.m + ' requests have no body.</p>' : '<textarea id="body" spellcheck="false" placeholder="No body for this endpoint">' + esc(t.body) + '</textarea><div id="jchk" class="mu"></div>';
+        else h = '<pre id="curl">' + esc(curl(t)) + '</pre><button data-a="copycurl" style="margin-top:6px">Copy cURL</button>';
+        $('#sc').innerHTML = h;
+        if (t.sub === 'b') chkJson(t);
+    }
+
+    function chkJson(t) {
+        const el = $('#jchk');
+        if (!el) return;
+        if (!t.body.trim()) {
+            el.textContent = '';
+            return;
+        }
+        try {
+            JSON.parse(sub(t.body));
+            el.textContent = '\u2713 valid JSON';
+            el.style.color = 'var(--ok)';
+        } catch (e) {
+            el.textContent = '\u2717 ' + e.message;
+            el.style.color = 'var(--er)';
+        }
+    }
+
+    function paintUrl(t) {
+        const u = $('#url');
+        if (u) u.value = build(t, false);
+        if (t.sub === 'c' && $('#curl')) $('#curl').textContent = curl(t);
+    }
+
+    const re = /("(?:\\.|[^"\\])*")(\s*:)?|\b(true|false|null)\b|-?\d+\.?\d*(?:[eE][+-]?\d+)?/g;
+
+    function hl(s) {
+        if (s.length > 200000) return esc(s);
+        let o = '', l = 0;
+        s.replace(re, (m, str, col, kw, off) => {
+            o += esc(s.slice(l, off));
+            o += str ? (col ? '<i class="k">' + esc(str) + '</i>' + col : '<i class="s">' + esc(str) + '</i>') : kw ? '<i class="b">' + m + '</i>' : '<i class="n">' + m + '</i>';
+            l = off + m.length;
+            return m;
+        });
+        return o + esc(s.slice(l));
+    }
+
+    function paintResp(t) {
+        const el = $('#res');
+        if (!el) return;
+        if (t.busy) {
+            el.innerHTML = '<span class="mu">Sending request&hellip;</span>';
+            return;
+        }
+        const r = t.resp;
+        if (!r) {
+            el.innerHTML = '<span class="mu">Hit <b>Send</b> (or Ctrl/Cmd + Enter) to get a response.</span>';
+            return;
+        }
+        if (r.err) {
+            el.innerHTML = '<div class="rh"><span class="pill se">Network error</span><span class="mu">' + r.ms + ' ms</span></div><div class="out">' + esc(r.err) + '</div>' +
+                '<div class="hint"><b>The browser could not complete the request to</b> <code>' + esc(r.u) + '</code><br>Either the service is not running / the port is wrong (check <b>Servers &amp; ports</b>), or the browser blocked it because the page origin (<code>' + esc(location.origin) + '</code>) differs from the target and the service sends no CORS headers.<br><br>' +
+                '&bull; <b>Easiest:</b> switch to <b>Via API Gateway</b> and open this page through the gateway (<code>http://localhost:8765/web/</code>) so every call is same-origin.<br>' +
+                '&bull; <b>Direct ports:</b> add a CORS config to each service (see the notes that came with this file).</div>';
+            return;
+        }
+        let pretty = r.body, isJson = false;
+        try {
+            pretty = J(JSON.parse(r.body));
+            isJson = true;
+        } catch (e) {
+        }
+        const empty = !r.body.length;
+        let body;
+        if (t.rtab === 'headers') body = '<table class="kv">' + r.hd.map(h => '<tr><td style="width:220px;text-align:left"><b>' + esc(h[0]) + '</b></td><td>' + esc(h[1]) + '</td></tr>').join('') + '</table>' + (r.hd.length ? '' : '<p class="mu">No readable headers (CORS only exposes safelisted headers).</p>');
+        else if (empty) body = '<div class="out mu">(empty body)</div>';
+        else body = '<div class="out">' + (t.rtab === 'pretty' && isJson ? hl(pretty) : esc(r.body)) + '</div>';
+        const sz = r.size < 1024 ? r.size + ' B' : (r.size / 1024).toFixed(1) + ' KB';
+        el.innerHTML = '<div class="rh"><b>Response</b><span class="pill s' + String(r.status)[0] + '">' + r.status + ' ' + esc(r.text) + '</span><span class="mu">' + r.ms + ' ms</span><span class="mu">' + sz + '</span>' +
+            '<span class="st" style="margin:0 0 0 auto;border:0">' + [['pretty', 'Pretty'], ['raw', 'Raw'], ['headers', 'Headers (' + r.hd.length + ')']].map(x => '<button data-a="rtab" data-r="' + x[0] + '" class="' + (t.rtab === x[0] ? 'on' : '') + '">' + x[1] + '</button>').join('') + '<button data-a="copyres">Copy</button></span></div>' + body;
+    }
+
+    function render() {
+        paintTree();
+        paintTabs();
+        const t = T(), pane = $('#pane');
+        if (!t) {
+            pane.innerHTML = '<div><h2 style="margin:0 0 4px">ATM microservices &mdash; API console</h2><p class="mu" style="margin:0 0 14px">' + SVC.reduce((a, s) => a + s.ep.length, 0) + ' endpoints from ' + SVC.length + ' controllers. Pick one on the left, or start from a service:</p></div><div class="grid">' +
+                SVC.map((s, i) => '<div class="card" data-a="open" data-si="' + i + '" data-ei="0"><h3>' + esc(s.n) + '</h3><span class="mu">' + esc(base(s)) + '</span><br><span class="mu">' + s.ep.length + ' endpoint' + (s.ep.length > 1 ? 's' : '') + '</span></div>').join('') + '</div>' +
+                '<p class="mu">Demo data: account <code>1</code> (balance 1250.00), card <code>4532678912348812</code> / PIN <code>1234</code>, admin <code>admin</code> / <code>1234</code>.</p>';
+            return;
+        }
+        pane.innerHTML = '<div class="bar"><b class="m ' + t.e.m + '">' + t.e.m + '</b><input id="url" readonly><button class="send" data-a="send">Send</button></div>' +
+            '<p class="desc"><b>' + esc(t.e.n) + '</b> &middot; ' + esc(t.s.n) + (t.e.d ? ' &mdash; ' + esc(t.e.d) : '') + '</p>' +
+            '<div><div class="st" id="st"></div><div id="sc" style="padding-top:8px"></div></div><div class="res" id="res"></div>';
+        paintUrl(t);
+        paintSub(t);
+        paintResp(t);
+    }
+
+    function open(si, ei) {
+        const key = si + '.' + ei;
+        if (!tabs.find(t => t.key === key)) tabs.push(mk(si, ei, key));
+        cur = key;
+        render();
+    }
+
+    async function send(t) {
+        if (t.busy) return;
+        const hd = {};
+        t.h.forEach(r => {
+            if (r.on && r.k) hd[r.k] = sub(r.v);
+        });
+        const init = {method: t.e.m, headers: hd}, u = build(t, true);
+        if (hasBody(t)) init.body = sub(t.body);
+        t.busy = 1;
+        paintResp(t);
+        const t0 = performance.now();
+        try {
+            const r = await fetch(u, init), txt = await r.text();
+            t.resp = {
+                status: r.status,
+                text: r.statusText,
+                ms: Math.round(performance.now() - t0),
+                size: new Blob([txt]).size,
+                body: txt,
+                hd: Array.from(r.headers.entries()),
+                u
+            };
+        } catch (err) {
+            t.resp = {err: String(err), ms: Math.round(performance.now() - t0), u};
+        }
+        t.busy = 0;
+        t.rtab = 'pretty';
+        his.unshift({m: t.e.m, u, st: t.resp.status, si: t.si, ei: t.ei, q: t.q, h: t.h, pv: t.pv, body: t.body});
+        his = his.slice(0, 30);
+        LS.set('atm.his', his);
+        if (T() === t) {
+            paintResp(t);
+            if (view === 'his') paintTree();
+        }
+    }
+
+    function serversDialog() {
+        $('#dlg').innerHTML = '<h3 style="margin-top:0">Servers &amp; ports</h3>' +
+            SVC.map(s => '<label>' + esc(s.n) + '<input type="number" data-port="' + s.id + '" value="' + (cfg.ports[s.id] || s.port) + '"></label>').join('') +
+            '<label>API Gateway<input type="number" data-port="__gw" value="' + cfg.gw + '"></label>' +
+            '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button data-a="resetports">Reset</button><button class="send" data-a="saveports">Save</button></div>';
+        $('#dlg').showModal();
+    }
+
+    document.addEventListener('click', e => {
+        const el = e.target.closest('[data-a]');
+        if (!el) return;
+        const d = el.dataset, t = T();
+        switch (d.a) {
+            case 'open':
+                open(+d.si, +d.ei);
+                break;
+            case 'tab':
+                cur = d.k;
+                render();
+                break;
+            case 'close':
+                e.stopPropagation();
+                tabs = tabs.filter(x => x.key !== d.k);
+                if (cur === d.k) cur = tabs.length ? tabs[tabs.length - 1].key : null;
+                render();
+                break;
+            case 'view':
+                view = d.v;
+                document.querySelectorAll('.seg button').forEach(b => b.classList.toggle('on', b === el));
+                paintTree();
+                break;
+            case 'sub':
+                t.sub = d.s;
+                paintSub(t);
+                break;
+            case 'add':
+                t[d.l].push({on: true, k: '', v: ''});
+                paintSub(t);
+                break;
+            case 'del':
+                t[d.l].splice(+d.i, 1);
+                paintSub(t);
+                paintUrl(t);
+                break;
+            case 'send':
+                send(t);
+                break;
+            case 'rtab':
+                t.rtab = d.r;
+                paintResp(t);
+                break;
+            case 'copyres':
+                navigator.clipboard && navigator.clipboard.writeText(t.resp ? t.resp.body : '');
+                break;
+            case 'copycurl':
+                navigator.clipboard && navigator.clipboard.writeText(curl(t));
+                break;
+            case 'servers':
+                serversDialog();
+                break;
+            case 'resetports':
+                cfg.ports = {};
+                cfg.gw = 8765;
+                saveCfg();
+                $('#dlg').close();
+                render();
+                break;
+            case 'saveports':
+                document.querySelectorAll('[data-port]').forEach(i => {
+                    const v = +i.value;
+                    if (i.dataset.port === '__gw') cfg.gw = v || 8765; else cfg.ports[i.dataset.port] = v;
+                });
+                saveCfg();
+                $('#dlg').close();
+                render();
+                break;
+            case 'clearhis':
+                his = [];
+                LS.set('atm.his', his);
+                paintTree();
+                break;
+            case 'hist': {
+                const h = his[+d.i], key = 'h' + Date.now(), n = mk(h.si, h.ei, key);
+                Object.assign(n, {
+                    q: JSON.parse(JSON.stringify(h.q)),
+                    h: JSON.parse(JSON.stringify(h.h)),
+                    pv: Object.assign({}, h.pv),
+                    body: h.body
+                });
+                tabs.push(n);
+                cur = key;
+                render();
+                break;
+            }
+        }
+    });
+
+    document.addEventListener('input', e => {
+        const el = e.target, t = T();
+        if (el.id === 'filter') {
+            paintTree();
+            return;
+        }
+        if (!t) return;
+        if (el.dataset.l) {
+            const r = t[el.dataset.l][+el.dataset.i], f = el.dataset.f;
+            r[f] = f === 'on' ? el.checked : el.value;
+        } else if (el.dataset.pv) t.pv[el.dataset.pv] = el.value;
+        else if (el.id === 'body') {
+            t.body = el.value;
+            chkJson(t);
+        } else return;
+        paintUrl(t);
+    });
+
+    document.addEventListener('keydown', e => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && T()) send(T());
+    });
+
+    $('#mode').value = cfg.mode;
+    $('#host').value = cfg.host;
+    $('#mode').addEventListener('change', e => {
+        cfg.mode = e.target.value;
+        saveCfg();
+        render();
+    });
+    $('#host').addEventListener('change', e => {
+        cfg.host = e.target.value.trim() || 'localhost';
+        saveCfg();
+        $('#eureka').href = proto + '//' + cfg.host + ':8761';
+        render();
+    });
+    $('#eureka').href = proto + '//' + cfg.host + ':8761';
+    render();
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: service-registry
+
+server:
+  port: 8761
+
+eureka:
+  instance:
+    hostname: ${EUREKA_INSTANCE_HOSTNAME:localhost}
+
+  server:
+    use-read-only-response-cache: false
+    response-cache-update-interval-ms: 3000
+    enable-self-preservation: false
+
+  client:
+    fetch-registry: false
+    register-with-eureka: false

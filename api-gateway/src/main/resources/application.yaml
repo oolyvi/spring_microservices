@@ -1,0 +1,69 @@
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: account-service
+              uri: lb://account-service
+              predicates:
+                - Path=/account/**
+
+            - id: admin-service
+              uri: lb://admin-service
+              predicates:
+                - Path=/admin/**
+
+            - id: atm-service
+              uri: lb://atm-service
+              predicates:
+                - Path=/atm/**
+
+            - id: card-service
+              uri: lb://card-service
+              predicates:
+                - Path=/card/**
+
+            - id: cash-service
+              uri: lb://cash-service
+              predicates:
+                - Path=/cash/**
+
+            - id: customer-service
+              uri: lb://customer-service
+              predicates:
+                - Path=/customer/**
+
+            - id: notification-service
+              uri: lb://notification-service
+              predicates:
+                - Path=/notification/**
+
+            - id: transaction-service
+              uri: lb://transaction-service
+              predicates:
+                - Path=/transaction/**
+
+            - id: web-client
+              uri: lb://web-client
+              predicates:
+                - Path=/web/**
+              filters:
+                - StripPrefix=1
+
+server:
+  port: 8765
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
+    register-with-eureka: true
+    fetch-registry: true
+
+  instance:
+    hostname: ${EUREKA_INSTANCE_HOSTNAME:localhost}
+    prefer-ip-address: true
